@@ -27,38 +27,38 @@ export default function EventCard({
       rel="noopener noreferrer"
       className="block group"
     >
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden">
+      <div className="bg-[#201c1c] rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-[450px] flex flex-col">
         {imageUrl && (
-          <div className="relative h-48 overflow-hidden">
+          <div className="relative h-48 w-full overflow-hidden">
             <img
               src={imageUrl}
               alt={title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-300"
             />
           </div>
         )}
         
-        <div className="p-6">
-          <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+        <div className="p-6 flex-1 flex flex-col">
+          <h3 className="text-xl font-semibold mb-2 text-[#fea900] group-hover:text-white transition-colors line-clamp-2 min-h-[3.5rem]">
             {title}
           </h3>
           
-          <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
+          <p className="text-[#e0e0e0] mb-4 line-clamp-2 flex-grow">
             {description}
           </p>
           
-          <div className="space-y-2">
-            <div className="flex items-center text-gray-500 dark:text-gray-400">
+          <div className="space-y-2 mt-auto">
+            <div className="flex items-center text-[#e0e0e0]">
               <CalendarIcon className="h-5 w-5 mr-2 flex-shrink-0" />
               <span>{date}</span>
             </div>
             
-            <div className="flex items-center text-gray-500 dark:text-gray-400">
+            <div className="flex items-center text-[#e0e0e0]">
               <ClockIcon className="h-5 w-5 mr-2 flex-shrink-0" />
               <span>{time}</span>
             </div>
             
-            <div className="flex items-center text-gray-500 dark:text-gray-400">
+            <div className="flex items-center text-[#e0e0e0]">
               <MapPinIcon className="h-5 w-5 mr-2 flex-shrink-0" />
               <span className="line-clamp-1">{address}</span>
             </div>
