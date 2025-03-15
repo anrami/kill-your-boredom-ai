@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "axios": "^1.8.3",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
     "next": "15.2.2",
+    "outline": "link:@heroicons/react/24/outline",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
