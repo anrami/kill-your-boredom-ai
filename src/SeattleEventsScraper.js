@@ -2,7 +2,9 @@ require('dotenv').config({ path: '/Users/aksharawari/Documents/Personal Projects
 const axios = require('axios');
 const readline = require('readline');
 
-const apiKey = process.env.TAVILY_API_KEY;
+
+
+const apiKey = TAVILY_API_KEY;
 
 if (!apiKey) {
   console.error('TAVILY_API_KEY is missing. Please check your .env or .env.local file.');

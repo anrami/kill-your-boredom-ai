@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import EventCard from './EventCard';
 import Loader from './Loader';
 
@@ -22,35 +22,16 @@ const cities = [
   'Kirkland',
 ];
 
-const sampleEvents = [
-  {
-    title: "Jazz Night at The Triple Door",
-    description: "Join us for an evening of smooth jazz featuring local artists and special guests. Enjoy craft cocktails and a full dinner menu while experiencing Seattle's vibrant jazz scene.",
-    address: "216 Union St, Seattle, WA 98101",
-    eventUrl: "https://example.com/jazz-night",
-    date: "March 20, 2025",
-    time: "8:00 PM",
-    imageUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819"
-  },
-  {
-    title: "Spring Food Festival",
-    description: "Experience the best of Pacific Northwest cuisine with over 30 local vendors, cooking demonstrations, and wine tasting sessions.",
-    address: "305 Harrison St, Seattle, WA 98109",
-    eventUrl: "https://example.com/food-festival",
-    date: "March 23, 2025",
-    time: "11:00 AM - 7:00 PM",
-    imageUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1"
-  },
-  {
-    title: "Art Walk & Gallery Opening",
-    description: "First Thursday Art Walk featuring new exhibitions from local and international artists. Free admission to participating galleries.",
-    address: "Pioneer Square, Seattle, WA",
-    eventUrl: "https://example.com/art-walk",
-    date: "April 4, 2025",
-    time: "5:00 PM - 9:00 PM",
-    imageUrl: "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b"
-  }
-];
+// Define Event interface to match our backend API
+interface Event {
+  title: string;
+  date: string;
+  description?: string;
+  isFree: boolean;
+  location?: string;
+  url: string;
+  source: string;
+}
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -58,18 +39,106 @@ export default function Home() {
   const [selectedCity, setSelectedCity] = useState('Seattle');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [events, setEvents] = useState(sampleEvents);
-  const [isLoading, setIsLoading] = useState(false);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [dateEvents, setDateEvents] = useState<Event[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dateLoading, setDateLoading] = useState(false);
+  const [error, setError] = useState('');
 
+  // Format date as YYYY-MM-DD
+  const formatDate = (date: Date): string => {
+    return date.toISOString().split('T')[0];
+  };
+  
+  // Get tomorrow's date
+  const getTomorrowDate = (): string => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return formatDate(tomorrow);
+  };
+  
+  // Fetch all events on initial load
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setIsLoading(true);
+        const response = await fetch('http://localhost:3001/api/events');
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        
+        const data = await response.json();
+        setEvents(data.events || []);
+        setError('');
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        setError('Failed to load events. Please try again later.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchEvents();
+  }, []);
+  
+  // Fetch events for a specific date
+  const fetchEventsByDate = async (date: string) => {
+    try {
+      setDateLoading(true);
+      const response = await fetch(`http://localhost:3001/api/events/date/${date}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch events for this date');
+      }
+      
+      const data = await response.json();
+      setDateEvents(data.events || []);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching events by date:', err);
+      setError('Failed to load events for this date. Please try again.');
+      setDateEvents([]);
+    } finally {
+      setDateLoading(false);
+    }
+  };
+  
+  // Search events with text query and filters
+  const searchEvents = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Build query parameters
+      const params = new URLSearchParams();
+      if (searchQuery) params.append('q', searchQuery);
+      if (selectedCategory !== 'All') params.append('category', selectedCategory);
+      if (selectedCity) params.append('city', selectedCity);
+      if (startDate) params.append('date', startDate);
+      
+      // Use our new backend search endpoint
+      const response = await fetch(`http://localhost:3001/api/events/search?${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to search events');
+      }
+      
+      const data = await response.json();
+      setEvents(data.events || []);
+      setError('');
+    } catch (err) {
+      console.error('Error searching events:', err);
+      setError('Failed to search events. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      searchQuery,
-      selectedCategory,
-      selectedCity,
-      startDate,
-      endDate,
-    });
+    
+    // Use the unified search endpoint for all searches
+    searchEvents();
   };
 
   return (
@@ -164,21 +233,52 @@ export default function Home() {
           </form>
         </div>
 
-        {isLoading && <Loader />}
-        {events.length !== 0 && !isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event, index) => (
-            <EventCard
-              key={index}
-              title={event.title}
-              description={event.description}
-              address={event.address}
-              eventUrl={event.eventUrl}
-              date={event.date}
-              time={event.time}
-              imageUrl={event.imageUrl}
-            />
-          ))}
-        </div>}
+        {error && (
+          <div className="p-4 mb-6 bg-red-100 border border-red-400 text-red-700 rounded-md">
+            {error}
+          </div>
+        )}
+        
+        {startDate && dateEvents.length > 0 && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-semibold mb-4 text-[#fea900]">
+              Events for {new Date(startDate).toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </h2>
+            
+            {dateLoading ? (
+              <Loader />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {dateEvents.map((event, index) => (
+                  <EventCard key={`${event.title}-${index}`} event={event} />
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        
+        <h2 className="text-2xl font-semibold mb-4 text-[#fea900]">
+          All Upcoming Events
+        </h2>
+        
+        {isLoading ? (
+          <Loader />
+        ) : events.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.map((event, index) => (
+              <EventCard key={`${event.title}-${index}`} event={event} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-center py-8 text-[#e0e0e0]">
+            No events found. Please try again later.
+          </p>
+        )}
       </div>
     </main>
   );

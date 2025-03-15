@@ -51,14 +51,13 @@ class SeattleEventsScraper {
           
           // Get current month and year for the date
           const now = new Date();
-          const monthNames = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-          ];
+          
+          // Format date in ISO format
+          const date = now.toISOString().split('T')[0];
           
           events.push({
             title,
-            date: `${monthNames[now.getMonth()]} ${now.getFullYear()}`,
+            date,
             isFree,
             url: eventUrl
           });
@@ -105,20 +104,26 @@ class SeattleEventsScraper {
       
       // Extract events from Tavily results
       const events = tavilyResults.map(result => {
-        // Extract date if available in the content
-        let eventDate = '';
+        // Extract and format date
+        let eventDate;
         const dateMatch = result.content && result.content.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(st|nd|rd|th)?(,? \d{4})?/i);
         
         if (dateMatch) {
-          eventDate = dateMatch[0];
-        } else {
-          // If no specific date found, use current month/year
+          // Try to parse the matched date
+          try {
+            const parsedDate = new Date(dateMatch[0]);
+            if (!isNaN(parsedDate.getTime())) {
+              eventDate = parsedDate.toISOString().split('T')[0];
+            }
+          } catch (err) {
+            console.warn(`Could not parse date: ${dateMatch[0]}`);
+          }
+        }
+        
+        // If no valid date found or parsing failed, use current date
+        if (!eventDate) {
           const now = new Date();
-          const monthNames = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-          ];
-          eventDate = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+          eventDate = now.toISOString().split('T')[0];
         }
         
         // Extract location if available
@@ -207,7 +212,7 @@ class SeattleEventsScraper {
         {
           headers: {
             'Content-Type': 'application/json',
-            'api-key': this.apiKey
+            'Authorization': `Bearer ${this.apiKey}`
           }
         }
       );
