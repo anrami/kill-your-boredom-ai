@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import EventCard from './EventCard';
+import Loader from './Loader';
 
 const categories = [
   'All',
@@ -21,7 +22,6 @@ const cities = [
   'Kirkland',
 ];
 
-// Sample events data
 const sampleEvents = [
   {
     title: "Jazz Night at The Triple Door",
@@ -59,6 +59,7 @@ export default function Home() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [events, setEvents] = useState(sampleEvents);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,18 +73,18 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
+    <main className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">
-            Kill Your Boredom
+          <h1 className="text-5xl font-extrabold uppercase text-[#fea900] mb-4">
+            Kill Your Boredom AI
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Discover amazing events happening around you
+          <p className="text-lg text-[#e0e0e0]">
+            Discover amazing events happening around you.
           </p>
         </div>
         
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 sm:p-8 mb-12">
+        <div className="bg-[#201c1c] rounded-2xl shadow-xl p-6 sm:p-8 mb-12 border border-[#333333]">
           <form onSubmit={handleSearch} className="space-y-8">
             <div className="relative">
               <input
@@ -91,11 +92,11 @@ export default function Home() {
                 placeholder="Search for events..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-4 pl-5 pr-16 text-lg rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                className="w-full p-4 pl-5 pr-16 text-lg rounded-xl border border-[#333333] bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:opacity-90 transition-opacity"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#fea900] text-[#201c1c] rounded-lg hover:opacity-90 transition-opacity"
               >
                 Search
               </button>
@@ -103,13 +104,13 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-[#fea900]">
                   Category
                 </label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 rounded-lg border border-[#333333] dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 >
                   {categories.map((category) => (
                     <option key={category} value={category}>
@@ -120,13 +121,13 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-[#fea900]">
                   City
                 </label>
                 <select
                   value={selectedCity}
                   onChange={(e) => setSelectedCity(e.target.value)}
-                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 rounded-lg border border-[#333333]  dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 >
                   {cities.map((city) => (
                     <option key={city} value={city}>
@@ -137,33 +138,34 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-[#fea900]">
                   Start Date
                 </label>
                 <input
                   type="date"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 rounded-lg border border-[#333333] dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="block text-sm font-medium text-[#fea900]">
                   End Date
                 </label>
                 <input
                   type="date"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
-                  className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full p-3 rounded-lg border border-[#333333] dark:border-gray-700 bg-transparent focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
             </div>
           </form>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading && <Loader />}
+        {events.length !== 0 && !isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event, index) => (
             <EventCard
               key={index}
@@ -176,7 +178,7 @@ export default function Home() {
               imageUrl={event.imageUrl}
             />
           ))}
-        </div>
+        </div>}
       </div>
     </main>
   );

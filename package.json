@@ -16,7 +16,8 @@
     "dotenv": "^16.4.7",
     "next": "15.2.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-loader-spinner": "^6.1.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
