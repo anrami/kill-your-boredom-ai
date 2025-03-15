@@ -101,7 +101,7 @@ class SeattleEventsScraper {
         {
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${this.apiKey}`
+            'api-key': this.apiKey
           }
         }
       );
@@ -163,7 +163,7 @@ if (require.main === module) {
   // Read API key from .env.local
   let apiKey;
   try {
-    const envPath = path.resolve(__dirname, '../../../.env.local');
+    const envPath = path.resolve(__dirname, '../.env.local');
     console.log('Looking for .env.local at:', envPath);
     const envContent = fs.readFileSync(envPath, 'utf8');
     const match = envContent.match(/TAVILY_API_KEY=([^\s]+)/);

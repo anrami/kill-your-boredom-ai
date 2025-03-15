@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@tavily/core": "^0.3.1",
     "axios": "^1.8.3",
     "cheerio": "^1.0.0",
     "dotenv": "^16.4.7",
@@ -26,5 +27,18 @@
     "eslint-config-next": "15.2.2",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "description": "This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).",
+  "main": "debug-events.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anrami/kill-your-boredom-ai.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anrami/kill-your-boredom-ai/issues"
+  },
+  "homepage": "https://github.com/anrami/kill-your-boredom-ai#readme"
 }

@@ -7,7 +7,7 @@ const path = require('path');
 // Read the API key directly from .env.local file
 let apiKey;
 try {
-  const envPath = path.resolve(__dirname, '../.env.local');
+  const envPath = path.resolve(__dirname, './src/.env.local');
   console.log('Looking for .env.local at:', envPath);
   const envContent = fs.readFileSync(envPath, 'utf8');
   const match = envContent.match(/TAVILY_API_KEY=([^\s]+)/);
