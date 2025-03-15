@@ -22,7 +22,6 @@ const cities = [
   'Kirkland',
 ];
 
-// Define Event interface to match our backend API
 interface Event {
   title: string;
   date: string;
@@ -45,19 +44,16 @@ export default function Home() {
   const [dateLoading, setDateLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Format date as YYYY-MM-DD
   const formatDate = (date: Date): string => {
     return date.toISOString().split('T')[0];
   };
   
-  // Get tomorrow's date
   const getTomorrowDate = (): string => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     return formatDate(tomorrow);
   };
   
-  // Fetch all events on initial load
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -82,7 +78,6 @@ export default function Home() {
     fetchEvents();
   }, []);
   
-  // Fetch events for a specific date
   const fetchEventsByDate = async (date: string) => {
     try {
       setDateLoading(true);
@@ -143,17 +138,30 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <div className="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-extrabold uppercase text-[#fea900] mb-4">
-            Kill Your Boredom AI
-          </h1>
-          <p className="text-lg text-[#e0e0e0]">
-            Discover amazing events happening around you.
-          </p>
+      <div className="relative h-[400px] mb-0">
+        <div className="absolute inset-0">
+          <img
+            src="/seattle.jpg"
+            alt="Seattle cityscape"
+            className="w-full h-full object-cover blur-[2px] brightness-50"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/10" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0f1011] via-[#0f1011]/90 to-transparent" />
         </div>
-        
-        <div className="bg-[#201c1c] rounded-2xl shadow-xl p-6 sm:p-8 mb-12 border border-[#333333]">
+        <div className="relative h-full flex items-center justify-start ml-20">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold text-[#fea900] mb-4 drop-shadow-lg ">
+              Kill Your Boredom
+            </h1>
+            <p className="text-lg text-gray-200 drop-shadow-md">
+              Discover amazing events happening around you.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-18">
+        <div className="bg-[#201c1c]/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 mb-12 border border-[#333333] transition-all duration-300 hover:border-[#fea900]/30">
           <form onSubmit={handleSearch} className="space-y-8">
             <div className="relative">
               <input
@@ -165,7 +173,7 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#fea900] text-[#201c1c] rounded-lg hover:opacity-90 transition-opacity"
+                className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#fea900] text-[#201c1c] rounded-lg hover:opacity-90 transition-opacity"
               >
                 Search
               </button>
@@ -173,7 +181,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#fea900]">
+                <label className="block text-sm font-medium text-[#999999]">
                   Category
                 </label>
                 <select
@@ -190,7 +198,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#fea900]">
+                <label className="block text-sm font-medium text-[#999999]">
                   City
                 </label>
                 <select
@@ -207,7 +215,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#fea900]">
+                <label className="block text-sm font-medium text-[#999999]">
                   Start Date
                 </label>
                 <input
@@ -219,7 +227,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#fea900]">
+                <label className="block text-sm font-medium text-[#999999]">
                   End Date
                 </label>
                 <input
@@ -233,11 +241,11 @@ export default function Home() {
           </form>
         </div>
 
-        {error && (
+        {/* {error && (
           <div className="p-4 mb-6 bg-red-100 border border-red-400 text-red-700 rounded-md">
             {error}
           </div>
-        )}
+        )} */}
         
         {startDate && dateEvents.length > 0 && (
           <div className="mb-8">
