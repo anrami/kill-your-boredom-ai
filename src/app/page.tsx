@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import EventCard from './EventCard';
 import Loader from './Loader';
 
@@ -138,29 +139,39 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
-      <div className="relative h-[400px] mb-0">
+      <div className="relative h-[400px]">
         <div className="absolute inset-0">
-          <img
-            src="/seattle.jpg"
-            alt="Seattle cityscape"
-            className="w-full h-full object-cover blur-[2px] brightness-50"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/10" />
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="relative w-full h-full">
+              <Image
+                src="/seattle.jpg"
+                alt="Seattle cityscape"
+                fill
+                priority
+                quality={90}
+                sizes="100vw"
+                className="object-cover blur-[1px] brightness-[0.4] scale-110"
+              />
+            </div>
+          </div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 to-transparent" />
           <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0f1011] via-[#0f1011]/90 to-transparent" />
         </div>
-        <div className="relative h-full flex items-center justify-start ml-20">
-          <div className="text-center">
-            <h1 className="text-5xl font-bold text-[#fea900] mb-4 drop-shadow-lg ">
-              Kill Your Boredom
-            </h1>
-            <p className="text-lg text-gray-200 drop-shadow-md">
-              Discover amazing events happening around you.
-            </p>
+        <div className="relative h-full flex items-center">
+          <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-3xl">
+              <h1 className="text-5xl font-bold text-[#fea900] mb-4 drop-shadow-lg">
+                Kill Your Boredom AI
+              </h1>
+              <p className="text-lg text-gray-200 drop-shadow-md">
+                Discover amazing events happening around you.
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mb-18">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 mb-18">
         <div className="bg-[#201c1c]/80 backdrop-blur-sm rounded-2xl shadow-xl p-6 sm:p-8 mb-12 border border-[#333333] transition-all duration-300 hover:border-[#fea900]/30">
           <form onSubmit={handleSearch} className="space-y-8">
             <div className="relative">
@@ -181,7 +192,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#999999]">
+                <label className="block text-sm font-medium text-[#999999] w-full max-w-md">
                   Category
                 </label>
                 <select
@@ -198,7 +209,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#999999]">
+                <label className="block text-sm font-medium text-[#999999] w-full max-w-md">
                   City
                 </label>
                 <select
@@ -215,7 +226,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#999999]">
+                <label className="block text-sm font-medium text-[#999999] w-full max-w-md">
                   Start Date
                 </label>
                 <input
@@ -227,7 +238,7 @@ export default function Home() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#999999]">
+                <label className="block text-sm font-medium text-[#999999] w-full max-w-md">
                   End Date
                 </label>
                 <input
