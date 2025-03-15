@@ -1,8 +1,11 @@
 /**
  * Seattle Events Scraper
  * 
- * This module provides functionality to scrape events from events12.com/seattle
- * and enhance them with the Tavily API.
+ * This module provides functionality to scrape events from multiple sources:
+ * - events12.com/seattle
+ * - lu.ma (Seattle events)
+ * 
+ * Events are enhanced with the Tavily API for additional context.
  */
 
 const axios = require('axios');
@@ -13,18 +16,19 @@ const fs = require('fs');
 class SeattleEventsScraper {
   constructor(apiKey) {
     this.apiKey = apiKey;
-    this.baseUrl = 'https://www.events12.com/seattle/';
+    this.events12Url = 'https://www.events12.com/seattle/';
+    this.lumaUrl = 'https://lu.ma/seattle';
   }
 
   /**
    * Get all events from events12.com/seattle
    */
-  async getAllEvents() {
+  async getEvents12Events() {
     try {
       console.log('Fetching events from events12.com/seattle...');
       
       // Fetch the page
-      const response = await axios.get(this.baseUrl);
+      const response = await axios.get(this.events12Url);
       const $ = cheerio.load(response.data);
       
       // Extract events
@@ -69,12 +73,114 @@ class SeattleEventsScraper {
   }
 
   /**
+   * Get events from lu.ma for Seattle
+   */
+  async getLumaEvents() {
+    try {
+      console.log('Fetching events from lu.ma for Seattle...');
+      
+      // Since lu.ma might be using client-side rendering or have anti-scraping measures,
+      // we'll use Tavily API to get events from lu.ma instead of direct scraping
+      console.log('Using Tavily API to search for lu.ma Seattle events...');
+      
+      const tavilyResponse = await axios.post(
+        'https://api.tavily.com/search',
+        {
+          query: 'Seattle events lu.ma',
+          search_depth: "advanced",
+          include_domains: ['lu.ma'],
+          max_results: 20
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.apiKey}`
+          }
+        }
+      );
+      
+      // Process Tavily results
+      const tavilyResults = tavilyResponse.data.results || [];
+      console.log(`Found ${tavilyResults.length} lu.ma events via Tavily`);
+      
+      // Extract events from Tavily results
+      const events = tavilyResults.map(result => {
+        // Extract date if available in the content
+        let eventDate = '';
+        const dateMatch = result.content && result.content.match(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]* \d{1,2}(st|nd|rd|th)?(,? \d{4})?/i);
+        
+        if (dateMatch) {
+          eventDate = dateMatch[0];
+        } else {
+          // If no specific date found, use current month/year
+          const now = new Date();
+          const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+          ];
+          eventDate = `${monthNames[now.getMonth()]} ${now.getFullYear()}`;
+        }
+        
+        // Extract location if available
+        let location = 'Seattle';
+        const locationMatch = result.content && result.content.match(/(?:at|in|location:)\s+([^,.]+(?:,\s*[^,.]+)?)/i);
+        if (locationMatch) {
+          location = locationMatch[1].trim();
+        }
+        
+        // Check if event is free
+        const isFree = (result.title + ' ' + result.content).toLowerCase().includes('free');
+        
+        return {
+          title: result.title,
+          date: eventDate,
+          description: result.content ? result.content.substring(0, 200) + '...' : '',
+          isFree,
+          location,
+          url: result.url,
+          source: 'lu.ma'
+        };
+      });
+      
+      return events;
+    } catch (error) {
+      console.error('Error fetching lu.ma events:', error.message);
+      return [];
+    }
+  }
+  
+  /**
+   * Get all events from all sources
+   */
+  async getAllEvents() {
+    try {
+      // Get events from both sources
+      const [events12Events, lumaEvents] = await Promise.all([
+        this.getEvents12Events(),
+        this.getLumaEvents()
+      ]);
+      
+      // Add source information to events12 events
+      const events12WithSource = events12Events.map(event => ({
+        ...event,
+        source: 'events12.com'
+      }));
+      
+      // Combine all events
+      return [...events12WithSource, ...lumaEvents];
+    } catch (error) {
+      console.error('Error fetching all events:', error.message);
+      return [];
+    }
+  }
+
+  /**
    * Search for events on a specific date using Tavily API
    * @param {string} dateString - Date in YYYY-MM-DD format
    */
   async getEventsForDate(dateString) {
     try {
-      // First get all events from events12.com
+      // First get all events from all sources
       const allEvents = await this.getAllEvents();
       
       // Format the date for searching
@@ -93,10 +199,10 @@ class SeattleEventsScraper {
       const tavilyResponse = await axios.post(
         'https://api.tavily.com/search',
         {
-          query: `Seattle events on ${formattedDate} events12.com`,
+          query: `Seattle events on ${formattedDate}`,
           search_depth: "advanced",
-          include_domains: ['events12.com'],
-          max_results: 10
+          include_domains: ['events12.com', 'lu.ma'],
+          max_results: 15
         },
         {
           headers: {
@@ -181,16 +287,25 @@ if (require.main === module) {
   // Create scraper instance
   const scraper = new SeattleEventsScraper(apiKey);
   
-  // Test with tomorrow's date
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const dateString = tomorrow.toISOString().split('T')[0];
-
-  // Run the scraper
-  scraper.getEventsForDate(dateString)
+  // Test getting all events first
+  scraper.getAllEvents()
+    .then(events => {
+      console.log(`Found ${events.length} total events from all sources:`);
+      console.log(`- events12.com: ${events.filter(e => e.source === 'events12.com').length} events`);
+      console.log(`- lu.ma: ${events.filter(e => e.source === 'lu.ma').length} events`);
+      console.log('\nSample events:');
+      console.log(JSON.stringify(events.slice(0, 5), null, 2));
+      
+      // Now test with tomorrow's date
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const dateString = tomorrow.toISOString().split('T')[0];
+      
+      return scraper.getEventsForDate(dateString);
+    })
     .then(result => {
-      console.log(`Found ${result.events.length} events for ${result.date}:`);
-      console.log(JSON.stringify(result.events, null, 2));
+      console.log(`\nFound ${result.events.length} events for ${result.date}:`);
+      console.log(JSON.stringify(result.events.slice(0, 5), null, 2));
     })
     .catch(error => {
       console.error('Error:', error);
