@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import EventCard from './EventCard';
+import Loader from './Loader';
 
 const categories = [
   'All',
@@ -21,7 +22,6 @@ const cities = [
   'Kirkland',
 ];
 
-// Sample events data
 const sampleEvents = [
   {
     title: "Jazz Night at The Triple Door",
@@ -59,6 +59,7 @@ export default function Home() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [events, setEvents] = useState(sampleEvents);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,11 +73,11 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b dark:from-gray-900 dark:to-gray-800">
+    <main className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-16 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-extrabold uppercase text-[#fea900] mb-4">
-            Kill Your Boredom
+            Kill Your Boredom AI
           </h1>
           <p className="text-lg text-[#e0e0e0]">
             Discover amazing events happening around you.
@@ -163,7 +164,8 @@ export default function Home() {
           </form>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isLoading && <Loader />}
+        {events.length !== 0 && !isLoading && <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map((event, index) => (
             <EventCard
               key={index}
@@ -176,7 +178,7 @@ export default function Home() {
               imageUrl={event.imageUrl}
             />
           ))}
-        </div>
+        </div>}
       </div>
     </main>
   );

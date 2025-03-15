@@ -27,9 +27,9 @@ export default function EventCard({
       rel="noopener noreferrer"
       className="block group"
     >
-      <div className="bg-[#201c1c] rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden h-[450px] flex flex-col">
+      <div className="bg-[#201c1c] rounded-xl shadow-md hover:shadow-xl border border-[#333333] transition-shadow duration-300 overflow-hidden h-[450px] flex flex-col">
         {imageUrl && (
-          <div className="relative h-48 w-full overflow-hidden">
+          <div className="relative h-48 w-full overflow-hidden border-b border-[#333333]">
             <img
               src={imageUrl}
               alt={title}

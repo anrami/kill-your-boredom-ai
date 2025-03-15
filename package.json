@@ -16,7 +16,8 @@
     "next": "15.2.2",
     "outline": "link:@heroicons/react/24/outline",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-loader-spinner": "^6.1.6"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
